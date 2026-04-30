@@ -1,0 +1,186 @@
+# {{ app_name }}
+
+{{ description }}
+
+## 技术栈
+
+- **前端**: React + Vite + Tailwind CSS
+- **后端**: FastAPI + SQLAlchemy
+- **数据库**: SQLite
+
+## 端口配置
+
+本项目使用动态端口分配。端口配置保存在 `ports.json` 中：
+
+- 后端端口：{{ backend_port }}
+- 前端端口：{{ frontend_port }}
+
+如果端口被占用，系统会自动在范围内查找可用端口。
+
+## 快速开始（Windows 推荐）
+
+### Windows 用户一键启动
+
+**最简单的方式 - 双击运行：**
+
+1. **首次运行前**，先安装依赖（详见下方"安装依赖"部分）
+2. 双击 `start.bat` 启动应用
+3. 浏览器会自动打开到 http://localhost:{{ frontend_port }}
+
+**停止应用：**
+- 双击 `stop.bat`
+
+详细说明请参考：[新手使用指南.md](新手使用指南.md)
+
+---
+
+## 跨平台启动方式
+
+### 1. 安装依赖
+
+```bash
+# 安装后端依赖
+cd backend
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# Mac/Linux
+# source venv/bin/activate
+
+pip install -r requirements.txt
+
+# 安装前端依赖
+cd ../frontend
+npm install
+```
+
+### 2. 初始化数据库
+
+```bash
+cd backend
+python -c "from app.database import init_db; init_db()"
+
+# （可选）生成测试数据
+python seed.py
+```
+
+### 3. 启动应用（跨平台）
+
+**方式1：使用 Python 脚本**（跨平台，推荐）
+```bash
+# 在项目根目录运行
+python start.py
+```
+
+**方式2：手动分别启动**
+```bash
+# 终端1 - 启动后端
+cd backend
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port {{ backend_port }}
+
+# 终端2 - 启动前端
+cd frontend
+npm run dev
+```
+
+### 4. 访问应用
+
+- 前端：http://localhost:{{ frontend_port }}
+- 后端 API：http://localhost:{{ backend_port }}
+- API 文档：http://localhost:{{ backend_port }}/docs
+
+## 项目结构
+
+```
+{{ app_name }}/
+├── backend/              # 后端代码
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py       # FastAPI 入口
+│   │   ├── database.py   # 数据库配置
+│   │   ├── models.py     # SQLAlchemy 模型
+│   │   └── routes.py     # API 路由
+│   ├── requirements.txt
+│   └── seed.py           # 测试数据生成
+├── frontend/             # 前端代码
+│   ├── src/
+│   │   ├── main.jsx      # React 入口
+│   │   ├── App.jsx       # 主应用组件
+│   │   ├── index.css     # 全局样式
+│   │   └── api/
+│   │       └── client.js # API 客户端
+│   ├── package.json
+│   ├── vite.config.js
+│   └── tailwind.config.js
+├── ports.json            # 端口配置
+├── start.bat             # Windows 一键启动脚本
+├── stop.bat              # Windows 一键停止脚本
+├── start.py              # 跨平台启动脚本
+├── 新手使用指南.md       # 新手完整使用指南
+├── 创建桌面快捷方式.md    # 桌面快捷方式创建指南
+└── README.md             # 项目文档
+```
+
+## 🎨 主题自定义
+
+本项目使用理想汽车品牌色系：
+
+| 颜色 | 值 |
+|------|-----|
+| 主色 | `#1F2937` |
+| 强调色 | `#00D084` |
+
+修改主题色请编辑 `frontend/tailwind.config.js`：
+
+```js
+colors: {
+  'li-primary': '#1F2937',  // 修改主色
+  'li-accent': '#00D084',   // 修改强调色
+}
+```
+
+## API 端点
+
+{% for endpoint in api_endpoints %}
+- `{{ endpoint.method }} {{ endpoint.path }}` - {{ endpoint.description }}
+{% endfor %}
+
+## 开发说明
+
+### 添加新功能
+
+1. **添加数据模型** - 编辑 `backend/app/models.py`
+2. **添加API路由** - 编辑 `backend/app/routes.py`
+3. **添加前端页面** - 在 `frontend/src/pages/` 创建新组件
+
+### 数据库迁移
+
+本项目使用 SQLite，表结构变更后重新运行即可：
+
+```bash
+cd backend
+python -c "from app.database import init_db; init_db()"
+```
+
+### 修改端口
+
+如需更改端口，编辑 `ports.json` 文件，然后更新：
+- `backend/app/main.py` 中的 `BACKEND_PORT` 和 `FRONTEND_PORT`
+- `frontend/vite.config.js` 中的 `FRONTEND_PORT` 和 `BACKEND_PORT`
+
+## 部署
+
+### 生产环境配置
+
+1. 修改 CORS 配置（`backend/app/main.py`）
+2. 配置生产数据库（替换 SQLite）
+3. 构建前端：`cd frontend && npm run build`
+4. 使用生产 WSGI 服务器（如 Gunicorn）
+
+## License
+
+MIT
+
+---
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
