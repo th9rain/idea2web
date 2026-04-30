@@ -1,0 +1,63 @@
+"""
+{{ app_name }} FastAPI 应用入口
+"""
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from .routes import router
+from .database import init_db
+
+# 端口配置
+BACKEND_PORT = {{ backend_port }}
+FRONTEND_PORT = {{ frontend_port }}
+
+# 创建 FastAPI 应用
+app = FastAPI(
+    title="{{ app_name }} API",
+    description="{{ description }}",
+    version="1.0.0"
+)
+
+# 配置 CORS（使用动态端口）
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        f"http://localhost:{FRONTEND_PORT}",
+        f"http://127.0.0.1:{FRONTEND_PORT}",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 注册路由
+app.include_router(router)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """应用启动时初始化数据库"""
+    init_db()
+
+
+@app.get("/")
+async def root():
+    """根路径"""
+    return {
+        "message": "Welcome to {{ app_name }} API",
+        "docs": "/docs",
+        "redoc": "/redoc",
+        "backend_port": BACKEND_PORT,
+        "frontend_port": FRONTEND_PORT
+    }
+
+
+@app.get("/health")
+async def health_check():
+    """健康检查"""
+    return {"status": "healthy"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=BACKEND_PORT)
