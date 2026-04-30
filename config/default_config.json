@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "default_tech_stack": "react-fastapi",
+  "default_theme": "li-auto",
+  "max_features": 5,
+  "generation": {
+    "progress_interval": 5,
+    "create_backup": false,
+    "validate_syntax": true
+  },
+  "deployment": {
+    "auto_create_venv": true,
+    "auto_install_deps": true,
+    "auto_init_db": true,
+    "auto_start": false,
+    "mirrors": {
+      "pip": "https://pypi.tuna.tsinghua.edu.cn/simple",
+      "npm": "https://registry.npmmirror.com"
+    }
+  },
+  "ports": {
+    "backend": 8000,
+    "frontend": 5173
+  }
+}
