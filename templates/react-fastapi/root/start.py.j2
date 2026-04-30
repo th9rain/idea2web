@@ -1,0 +1,486 @@
+"""
+{{ app_name }} 启动脚本
+
+自动启动前后端服务，改进版：
+- 智能端口检查
+- 进程输出实时监控
+- 真正的服务就绪等待
+- 干净的进程终止
+"""
+
+import subprocess
+import sys
+import os
+import json
+import time
+import socket
+import threading
+from pathlib import Path
+
+
+def load_ports():
+    """从 ports.json 加载端口配置"""
+    ports_file = Path(__file__).parent / "ports.json"
+    if ports_file.exists():
+        with open(ports_file, 'r') as f:
+            ports = json.load(f)
+            return ports.get('backend_port', 8000), ports.get('frontend_port', 5173)
+    return 8000, 5173
+
+
+def is_port_available(port, host='127.0.0.1'):
+    """
+    检查端口是否可用（未被占用）
+
+    Returns:
+        True: 端口可用
+        False: 端口被占用
+    """
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            result = s.connect_ex((host, port))
+            return result != 0  # 连接失败说明端口可用
+    except Exception:
+        return False
+
+
+def wait_for_port(port, host='127.0.0.1', timeout=30):
+    """
+    等待端口就绪
+
+    Returns:
+        True: 端口就绪
+        False: 超时
+    """
+    start_time = time.time()
+
+    while time.time() - start_time < timeout:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                result = s.connect_ex((host, port))
+                if result == 0:
+                    return True
+        except Exception:
+            pass
+
+        time.sleep(0.5)
+
+    return False
+
+
+def auto_switch_port(original_port: int, config_file: str, key: str) -> int:
+    """自动切换端口并更新配置文件"""
+    import socket
+
+    # 尝试找到可用端口
+    for port in range(original_port + 1, original_port + 100):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                result = s.connect_ex(('127.0.0.1', port))
+                if result != 0:  # 端口可用
+                    print(f"✅ 找到可用端口：{port}")
+
+                    # 更新配置文件
+                    try:
+                        import json
+                        config_path = Path(__file__).parent / config_file
+                        with open(config_path, 'r', encoding='utf-8') as f:
+                            config = json.load(f)
+
+                        config[key] = port
+
+                        with open(config_path, 'w', encoding='utf-8') as f:
+                            json.dump(config, f, indent=2, ensure_ascii=False)
+
+                        print(f"✅ 配置已更新：{key} = {port}")
+                        return port
+                    except Exception as e:
+                        print(f"⚠️  配置更新失败：{e}")
+                        return port
+        except Exception:
+            pass
+
+    print(f"❌ 无法找到可用端口")
+    return original_port
+
+
+def find_venv_python(backend_dir):
+    """智能查找虚拟环境中的 Python"""
+    possible_paths = [
+        backend_dir / "venv" / "Scripts" / "python.exe",
+        backend_dir / "venv" / "bin" / "python",
+        backend_dir / ".venv" / "Scripts" / "python.exe",
+        backend_dir / ".venv" / "bin" / "python",
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            return path
+
+    return None
+
+
+def install_python_dependencies(backend_dir):
+    """自动安装 Python 依赖"""
+    venv_python = find_venv_python(backend_dir)
+
+    # 如果虚拟环境不存在，创建它
+    if venv_python is None:
+        print("🔧 创建 Python 虚拟环境...")
+        venv_dir = backend_dir / "venv"
+
+        result = subprocess.run(
+            [sys.executable, "-m", "venv", str(venv_dir)],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            print(f"❌ 虚拟环境创建失败：{result.stderr}")
+            return False
+
+        venv_python = find_venv_python(backend_dir)
+        if venv_python is None:
+            print("❌ 虚拟环境创建后仍然找不到 Python")
+            return False
+
+        print("✅ 虚拟环境创建成功")
+
+    # 检查是否需要安装依赖
+    requirements_file = backend_dir / "requirements.txt"
+    if not requirements_file.exists():
+        print("⚠️  未找到 requirements.txt，跳过依赖安装")
+        return True
+
+    # 尝试导入 fastapi 来判断是否已安装依赖
+    test_result = subprocess.run(
+        [str(venv_python), "-c", "import fastapi"],
+        capture_output=True,
+        text=True
+    )
+
+    if test_result.returncode == 0:
+        print("✅ Python 依赖已安装")
+        return True
+
+    # 安装依赖 - 使用多个镜像源尝试
+    print("🔧 安装 Python 依赖...")
+
+    mirrors = [
+        ("清华镜像", "https://pypi.tuna.tsinghua.edu.cn/simple"),
+        ("阿里镜像", "https://mirrors.aliyun.com/pypi/simple"),
+        ("豆瓣镜像", "https://pypi.douban.com/simple"),
+        ("官方源", "https://pypi.org/simple"),
+    ]
+
+    # 先升级 pip
+    subprocess.run(
+        [str(venv_python), "-m", "pip", "install", "--upgrade", "pip"],
+        capture_output=True,
+        timeout=60
+    )
+
+    # 尝试每个镜像源
+    for mirror_name, mirror_url in mirrors:
+        print(f"   尝试使用{mirror_name}...")
+        result = subprocess.run(
+            [str(venv_python), "-m", "pip", "install", "-r", str(requirements_file),
+             "-i", mirror_url],
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+
+        if result.returncode == 0:
+            print(f"✅ Python 依赖安装成功（{mirror_name}）")
+            return True
+        else:
+            print(f"   {mirror_name}失败，尝试下一个...")
+
+    # 所有镜像源都失败
+    print(f"❌ Python 依赖安装失败（已尝试所有镜像源）")
+    print(f"最后的错误信息：{result.stderr}")
+    print("\n手动安装命令：")
+    print(f"  cd {backend_dir}")
+    print(f"  {venv_python} -m pip install -r requirements.txt")
+    return False
+
+
+def install_node_dependencies(frontend_dir):
+    """自动安装 Node.js 依赖"""
+    node_modules = frontend_dir / "node_modules"
+
+    # 检查 node_modules 是否存在且不为空
+    if node_modules.exists() and any(node_modules.iterdir()):
+        print("✅ Node.js 依赖已安装")
+        return True
+
+    # 检查 package.json 是否存在
+    package_json = frontend_dir / "package.json"
+    if not package_json.exists():
+        print("⚠️  未找到 package.json，跳过依赖安装")
+        return True
+
+    # 检查 npm 是否可用
+    npm_check = subprocess.run(
+        ["npm", "--version"],
+        capture_output=True,
+        text=True
+    )
+
+    if npm_check.returncode != 0:
+        print("❌ 未找到 npm，请先安装 Node.js")
+        print("   下载地址：https://nodejs.org/")
+        return False
+
+    # 安装依赖 - 使用多个镜像源尝试
+    print("🔧 安装前端依赖...")
+
+    registries = [
+        ("淘宝镜像", "https://registry.npmmirror.com"),
+        ("腾讯镜像", "https://mirrors.cloud.tencent.com/npm/"),
+        ("官方源", "https://registry.npmjs.org"),
+    ]
+
+    # 尝试每个镜像源
+    for registry_name, registry_url in registries:
+        print(f"   尝试使用{registry_name}...")
+        result = subprocess.run(
+            ["npm", "install", f"--registry={registry_url}"],
+            cwd=frontend_dir,
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+
+        if result.returncode == 0:
+            print(f"✅ 前端依赖安装成功（{registry_name}）")
+            return True
+        else:
+            print(f"   {registry_name}失败，尝试下一个...")
+
+    # 所有镜像源都失败
+    print(f"❌ 前端依赖安装失败（已尝试所有镜像源）")
+    print(f"最后的错误信息：{result.stderr}")
+    print("\n手动安装命令：")
+    print(f"  cd {frontend_dir}")
+    print(f"  npm install")
+    return False
+
+
+def initialize_database(backend_dir, venv_python, max_retries=3):
+    """初始化数据库（带重试机制）"""
+    db_file = backend_dir / "app.db"
+
+    if db_file.exists():
+        print("✅ 数据库已存在")
+        return True
+
+    print("🔧 初始化数据库...")
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            result = subprocess.run(
+                [str(venv_python), "seed.py"],
+                cwd=backend_dir,
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+
+            if result.returncode == 0:
+                print("✅ 数据库初始化成功")
+                return True
+            else:
+                print(f"⚠️  数据库初始化失败（尝试 {attempt}/{max_retries}）")
+                print(f"   错误：{result.stderr[:200]}")
+
+                # 清理部分生成的文件
+                if db_file.exists():
+                    db_file.unlink()
+
+                if attempt < max_retries:
+                    print("   等待 2 秒后重试...")
+                    time.sleep(2)
+        except Exception as e:
+            print(f"⚠️  数据库初始化异常（尝试 {attempt}/{max_retries}）：{e}")
+            if attempt < max_retries:
+                time.sleep(2)
+
+    print("❌ 数据库初始化失败（已达到最大重试次数）")
+    return False
+
+
+def monitor_output(process, prefix, color_code):
+    """实时监控进程输出"""
+    try:
+        for line in iter(process.stdout.readline, ''):
+            if line:
+                print(f"\033[{color_code}m[{prefix}]\033[0m {line.rstrip()}")
+    except Exception:
+        pass
+
+
+def main():
+    """主函数"""
+    # 加载端口配置
+    backend_port, frontend_port = load_ports()
+
+    print("=" * 60)
+    print(f"{{ app_name }} 启动脚本")
+    print("=" * 60)
+    print()
+
+    # 显示端口信息
+    print(f"📍 端口配置：后端 {backend_port}，前端 {frontend_port}")
+    print()
+
+    # 检查端口状态并自动切换
+    if not is_port_available(backend_port):
+        print(f"⚠️  端口 {backend_port} 已被占用，尝试自动切换...")
+        backend_port = auto_switch_port(backend_port, "ports.json", "backend_port")
+
+    if not is_port_available(frontend_port):
+        print(f"⚠️  端口 {frontend_port} 已被占用，尝试自动切换...")
+        frontend_port = auto_switch_port(frontend_port, "ports.json", "frontend_port")
+
+    print("✅ 端口检查通过")
+    print()
+
+    # 检查依赖
+    backend_dir = Path(__file__).parent / "backend"
+    frontend_dir = Path(__file__).parent / "frontend"
+
+    # 自动安装后端依赖
+    print("📦 检查后端依赖...")
+    if not install_python_dependencies(backend_dir):
+        print("\n❌ 后端依赖安装失败，无法继续")
+        return
+
+    # 自动安装前端依赖
+    print("📦 检查前端依赖...")
+    if not install_node_dependencies(frontend_dir):
+        print("\n❌ 前端依赖安装失败，无法继续")
+        return
+
+    print("✅ 所有依赖已就绪")
+    print()
+
+    # 初始化数据库
+    venv_python = find_venv_python(backend_dir)
+    if venv_python and not initialize_database(backend_dir, venv_python):
+        print("\n❌ 数据库初始化失败，无法继续")
+        return
+
+    print()
+
+    # 启动后端
+    print(f"🚀 启动后端服务（端口 {backend_port}）...")
+
+    backend_process = subprocess.Popen(
+        [str(venv_python), "-m", "uvicorn", "app.main:app",
+         "--reload", "--host", "0.0.0.0", "--port", str(backend_port)],
+        cwd=backend_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
+    )
+
+    # 启动后端日志监控线程
+    threading.Thread(
+        target=monitor_output,
+        args=(backend_process, "后端", "34"),  # 蓝色
+        daemon=True
+    ).start()
+
+    # 等待后端就绪
+    print(f"⏳ 等待后端启动...")
+    if not wait_for_port(backend_port, timeout=30):
+        print("❌ 后端启动超时（30秒）")
+        print("   请检查后端错误日志")
+        backend_process.terminate()
+        return
+
+    print(f"✅ 后端已启动")
+    print()
+
+    # 启动前端
+    print(f"🚀 启动前端服务（端口 {frontend_port}）...")
+
+    frontend_process = subprocess.Popen(
+        ["npm", "run", "dev"],
+        cwd=frontend_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
+    )
+
+    # 启动前端日志监控线程
+    threading.Thread(
+        target=monitor_output,
+        args=(frontend_process, "前端", "32"),  # 绿色
+        daemon=True
+    ).start()
+
+    # 等待前端就绪
+    print(f"⏳ 等待前端启动...")
+    if not wait_for_port(frontend_port, timeout=30):
+        print("⚠️  前端启动超时（30秒），但继续运行...")
+    else:
+        print(f"✅ 前端已启动")
+
+    print()
+    print("=" * 60)
+    print("✅ 服务已启动！")
+    print()
+    print(f"📱 前端：http://localhost:{frontend_port}")
+    print(f"🔧 后端：http://localhost:{backend_port}")
+    print(f"📚 API 文档：http://localhost:{backend_port}/docs")
+    print()
+    print("按 Ctrl+C 停止服务")
+    print("=" * 60)
+
+    try:
+        # 监控进程状态
+        while True:
+            # 检查进程是否异常退出
+            if backend_process.poll() is not None:
+                print("\n⚠️  后端进程意外退出")
+                frontend_process.terminate()
+                break
+
+            if frontend_process.poll() is not None:
+                print("\n⚠️  前端进程意外退出")
+                backend_process.terminate()
+                break
+
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("\n\n⏹️  停止服务...")
+
+        # 温和终止
+        backend_process.terminate()
+        frontend_process.terminate()
+
+        # 等待 3 秒
+        time.sleep(3)
+
+        # 强制终止（如果还在运行）
+        if backend_process.poll() is None:
+            backend_process.kill()
+        if frontend_process.poll() is None:
+            frontend_process.kill()
+
+        print("✅ 服务已停止")
+
+
+if __name__ == "__main__":
+    main()
