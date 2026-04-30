@@ -1,0 +1,102 @@
+"""
+API 路由
+"""
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+from . import models
+from .database import get_db
+from pydantic import BaseModel
+from datetime import datetime
+
+router = APIRouter(prefix="/api", tags=["API"])
+
+{% for table in database_schema.tables %}
+{% set entity_name = table.name|singularize|pascal_case %}
+{% set entity_lower = entity_name|lower %}
+{% set entity_plural = table.name %}
+
+# ===== {{ entity_name }} Schemas =====
+
+class {{ entity_name }}Base(BaseModel):
+    """{{ entity_name }} 基础 Schema"""
+    {% for column in table.columns %}
+    {% if column.name not in ['id', 'created_at', 'updated_at'] %}
+    {{ column.name }}: {% if column.type == 'String' %}str{% elif column.type == 'Integer' %}int{% elif column.type == 'Float' %}float{% elif column.type == 'Boolean' %}bool{% elif column.type == 'DateTime' %}datetime{% elif column.type == 'Text' %}str{% endif %}{% if column.nullable %} = None{% endif %}
+    {% endif %}
+    {% endfor %}
+
+class {{ entity_name }}Create({{ entity_name }}Base):
+    """创建 {{ entity_name }} 的 Schema"""
+    pass
+
+class {{ entity_name }}Update({{ entity_name }}Base):
+    """更新 {{ entity_name }} 的 Schema"""
+    pass
+
+class {{ entity_name }}({{ entity_name }}Base):
+    """{{ entity_name }} Schema"""
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ===== {{ entity_name }} 路由 =====
+
+@router.get("/{{ entity_plural }}", response_model=List[{{ entity_name }}])
+def list_{{ entity_plural }}(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """列出所有 {{ entity_name }}"""
+    items = db.query(models.{{ entity_name }}).offset(skip).limit(limit).all()
+    return items
+
+
+@router.post("/{{ entity_plural }}", response_model={{ entity_name }})
+def create_{{ entity_lower }}(item: {{ entity_name }}Create, db: Session = Depends(get_db)):
+    """创建新的 {{ entity_name }}"""
+    db_item = models.{{ entity_name }}(**item.model_dump())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+
+@router.get("/{{ entity_plural }}/{item_id}", response_model={{ entity_name }})
+def get_{{ entity_lower }}(item_id: int, db: Session = Depends(get_db)):
+    """获取单个 {{ entity_name }}"""
+    item = db.query(models.{{ entity_name }}).filter(models.{{ entity_name }}.id == item_id).first()
+    if item is None:
+        raise HTTPException(status_code=404, detail="{{ entity_name }} not found")
+    return item
+
+
+@router.put("/{{ entity_plural }}/{item_id}", response_model={{ entity_name }})
+def update_{{ entity_lower }}(item_id: int, item_update: {{ entity_name }}Update, db: Session = Depends(get_db)):
+    """更新 {{ entity_name }}"""
+    db_item = db.query(models.{{ entity_name }}).filter(models.{{ entity_name }}.id == item_id).first()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="{{ entity_name }} not found")
+
+    for key, value in item_update.model_dump(exclude_unset=True).items():
+        setattr(db_item, key, value)
+
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+
+@router.delete("/{{ entity_plural }}/{item_id}")
+def delete_{{ entity_lower }}(item_id: int, db: Session = Depends(get_db)):
+    """删除 {{ entity_name }}"""
+    db_item = db.query(models.{{ entity_name }}).filter(models.{{ entity_name }}.id == item_id).first()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="{{ entity_name }} not found")
+
+    db.delete(db_item)
+    db.commit()
+    return {"message": "{{ entity_name }} deleted successfully"}
+
+{% endfor %}
