@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 理想汽车暗色主题全局样式 */
+@layer base {
+  body {
+    @apply bg-li-green-base text-white antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  }
+
+  /* 隐藏滚动条（理想风格） */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white font-bold tracking-tight;
+  }
+
+  /* 选区样式 */
+  ::selection {
+    @apply bg-li-gold text-li-green-base;
+  }
+}
+
+@layer components {
+  /* 理想汽车风格主按钮（香槟金） */
+  .btn-primary {
+    @apply bg-li-gold hover:bg-li-gold-light text-li-green-base font-semibold px-6 py-3
+           rounded-full transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+
+  /* 理想汽车风格次要按钮（深绿） */
+  .btn-secondary {
+    @apply bg-li-green-card hover:bg-li-green-hover text-white font-medium px-6 py-3
+           rounded-full transition-colors duration-300 border border-white/10;
+  }
+
+  /* 理想汽车风格卡片（深色+超大圆角+光晕效果） */
+  .card {
+    @apply bg-li-green-card rounded-li-card p-10 relative overflow-hidden border border-white/5
+           hover:bg-li-green-hover transition-all duration-500;
+  }
+
+  /* 卡片内置光晕效果 */
+  .card::after {
+    content: '';
+    @apply absolute -bottom-24 -right-24 w-64 h-64 bg-li-gold/10 rounded-full blur-3xl
+           transition-all duration-700 pointer-events-none;
+  }
+
+  /* 卡片悬停时的光晕效果（需要在组件上添加 group 类） */
+  .group:hover .card::after {
+    @apply bg-li-gold/20;
+  }
+
+  /* 理想汽车风格输入框 */
+  .input {
+    @apply w-full px-4 py-3 bg-li-green-card border border-white/10 rounded-xl text-white
+           placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-li-gold focus:border-transparent
+           transition-all duration-200;
+  }
+
+  /* 渐变金色文字 */
+  .text-gradient-gold {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-li-gold via-li-gold-light to-li-gold;
+  }
+
+  /* 页面标题 */
+  .page-title {
+    @apply text-6xl md:text-8xl font-bold tracking-tighter mb-4;
+  }
+
+  .section-title {
+    @apply text-4xl font-bold tracking-tight mb-6;
+  }
+
+  /* 表格（深色风格） */
+  .table {
+    @apply w-full border-collapse bg-li-green-card rounded-xl overflow-hidden;
+  }
+
+  .table thead {
+    @apply bg-li-green-hover;
+  }
+
+  .table th {
+    @apply px-6 py-4 text-left text-sm font-semibold text-white/70 border-b border-white/5;
+  }
+
+  .table td {
+    @apply px-6 py-4 text-sm text-white border-b border-white/5;
+  }
+
+  .table tbody tr:hover {
+    @apply bg-li-green-hover;
+  }
+}
+
+/* 动画 */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
