@@ -8,12 +8,6 @@ A real reusable skill for generating full-stack web applications from a one-line
 
 It is not just a concept note or a prompt draft. It is an actual skill with workflow instructions, templates, scripts, config, and references for generating usable applications.
 
-## Install
-
-```bash
-npx skills add https://gitlab.chehejia.com/ai-market/lixiang-skills-marketplace/-/tree/master/packages/idea2web --depth 1 --single-branch
-```
-
 ## What this skill does
 
 From a short request like:
@@ -66,7 +60,7 @@ I care about making repeated work more structured and reusable. A lot of softwar
 
 ## Repository contents
 
-This skill includes real implementation assets such as:
+This repository includes the core public skill assets such as:
 - `SKILL.md`
 - generation scripts
 - config files
