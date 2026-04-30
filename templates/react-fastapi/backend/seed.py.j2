@@ -1,0 +1,47 @@
+"""
+测试数据生成脚本
+"""
+
+import sys
+sys.path.append('.')
+
+from app.database import SessionLocal, init_db
+from app import models
+from datetime import datetime, timedelta
+import random
+
+# 初始化数据库
+init_db()
+
+# 创建数据库会话
+db = SessionLocal()
+
+try:
+    print("开始生成测试数据...")
+
+    {% for table in database_schema.tables %}
+    {% set entity_name = table.name|singularize|pascal_case %}
+
+    # 生成 {{ entity_name }} 测试数据
+    {% for i in range(1, 6) %}
+    {{ entity_name|snake_case }}_{{ i }} = models.{{ entity_name }}(
+        {% for column in table.columns %}
+        {% if column.name not in ['id', 'created_at', 'updated_at'] %}
+        {{ column.name }}={% if column.type == 'String' %}"{{ entity_name }} {{ i }}"{% elif column.type == 'Integer' %}{{ i * 10 }}{% elif column.type == 'Float' %}{{ i * 10.5 }}{% elif column.type == 'Boolean' %}{{ 'True' if i % 2 == 0 else 'False' }}{% elif column.type == 'DateTime' %}datetime.now() - timedelta(days={{ i }}){% elif column.type == 'Text' %}"这是 {{ entity_name }} {{ i }} 的详细描述"{% endif %},
+        {% endif %}
+        {% endfor %}
+    )
+    db.add({{ entity_name|snake_case }}_{{ i }})
+    {% endfor %}
+
+    {% endfor %}
+
+    # 提交事务
+    db.commit()
+    print("✅ 测试数据生成成功！")
+
+except Exception as e:
+    print(f"❌ 错误: {str(e)}")
+    db.rollback()
+finally:
+    db.close()
