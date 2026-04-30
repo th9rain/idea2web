@@ -1,0 +1,18 @@
+"""
+数据库模型
+"""
+
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Text
+from datetime import datetime
+from .database import Base
+
+{% for table in database_schema.tables %}
+class {{ table.name|singularize|pascal_case }}(Base):
+    """{{ table.name|singularize|pascal_case }} 模型"""
+    __tablename__ = "{{ table.name }}"
+
+    {% for column in table.columns %}
+    {{ column.name }} = Column({{ column.type }}{% if column.primary_key %}, primary_key=True, index=True{% elif not column.nullable %}, nullable=False{% endif %}{% if column.name == 'created_at' %}, default=datetime.now{% elif column.name == 'updated_at' %}, default=datetime.now, onupdate=datetime.now{% endif %})
+    {% endfor %}
+
+{% endfor %}
