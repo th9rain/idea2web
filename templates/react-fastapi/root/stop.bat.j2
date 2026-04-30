@@ -1,0 +1,81 @@
+@echo off
+chcp 65001 >nul 2>&1
+title {{ app_name }} - 停止服务
+color 0C
+
+echo ============================================================
+echo              {{ app_name }} - 一键停止
+echo ============================================================
+echo.
+
+echo [1/3] 查找服务进程...
+
+REM 查找后端进程（端口 {{ backend_port }}）
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":{{ backend_port }}"') do (
+    set BACKEND_PID=%%a
+)
+
+REM 查找前端进程（端口 {{ frontend_port }}）
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":{{ frontend_port }}"') do (
+    set FRONTEND_PID=%%a
+)
+
+if not defined BACKEND_PID (
+    echo     ✓ 后端服务未运行
+) else (
+    echo     • 后端服务 PID: %BACKEND_PID%
+)
+
+if not defined FRONTEND_PID (
+    echo     ✓ 前端服务未运行
+) else (
+    echo     • 前端服务 PID: %FRONTEND_PID%
+)
+
+echo.
+echo [2/3] 停止服务进程...
+
+REM 终止后端进程
+if defined BACKEND_PID (
+    taskkill /PID %BACKEND_PID% /F >nul 2>&1
+    if %errorlevel%==0 (
+        echo     ✓ 后端服务已停止
+    ) else (
+        echo     ⚠ 后端服务停止失败（可能已关闭）
+    )
+) else (
+    echo     - 后端服务未在运行
+)
+
+REM 终止前端进程
+if defined FRONTEND_PID (
+    taskkill /PID %FRONTEND_PID% /F >nul 2>&1
+    if %errorlevel%==0 (
+        echo     ✓ 前端服务已停止
+    ) else (
+        echo     ⚠ 前端服务停止失败（可能已关闭）
+    )
+) else (
+    echo     - 前端服务未在运行
+)
+
+echo.
+echo [3/3] 关闭服务窗口...
+
+REM 关闭所有包含应用名称的命令窗口
+taskkill /FI "WINDOWTITLE eq {{ app_name }}-后端服务*" /F >nul 2>&1
+taskkill /FI "WINDOWTITLE eq {{ app_name }}-前端服务*" /F >nul 2>&1
+echo     ✓ 服务窗口已关闭
+
+echo.
+echo ============================================================
+echo                   停止完成！
+echo ============================================================
+echo.
+echo  所有服务已停止，您可以安全地关闭此窗口。
+echo.
+echo  重新启动请运行: start.bat
+echo.
+echo ============================================================
+echo.
+pause
