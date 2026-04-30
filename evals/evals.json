@@ -1,0 +1,165 @@
+{
+  "skill_name": "idea2web",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我想做一个个人记账软件。就是能记录每天的支出，比如今天买菜花了50块、坐地铁10块这样。然后能看到本月总共花了多少钱，按类别统计（比如餐饮、交通、购物这些）。就我一个人用，不需要登录注册什么的。",
+      "expected_output": "生成一个完整的记账应用，包含：1. 支出记录表单（金额、类别、日期、备注）；2. 支出列表页面（展示所有记录，可以编辑删除）；3. 月度统计图表（按类别汇总）；4. 使用React + FastAPI + SQLite技术栈；5. 包含CORS配置、启动脚本、测试数据；6. 运行 python start.py 能一键启动",
+      "files": [],
+      "assertions": [
+        {
+          "name": "项目结构完整",
+          "check": "存在 backend/, frontend/, start.py, README.md 目录和文件"
+        },
+        {
+          "name": "CORS 配置正确",
+          "check": "backend/app/main.py 包含 CORSMiddleware 配置，allow_origins 包含 localhost:5173"
+        },
+        {
+          "name": "Vite Proxy 配置",
+          "check": "frontend/vite.config.js 包含 /api proxy 配置指向 localhost:8000"
+        },
+        {
+          "name": "数据库模型完整",
+          "check": "backend/app/models.py 包含支出实体，有 amount, category, date 等字段"
+        },
+        {
+          "name": "API 路由存在",
+          "check": "backend/app/routes.py 包含 GET/POST/PUT/DELETE /api/expenses 端点"
+        },
+        {
+          "name": "测试数据脚本",
+          "check": "存在 backend/seed.py 文件"
+        },
+        {
+          "name": "代码无省略",
+          "check": "所有 .py 和 .jsx 文件中不包含 '...rest of code', '// TODO', '# ...' 等占位符"
+        },
+        {
+          "name": "启动脚本完整",
+          "check": "start.py 包含依赖安装、数据库初始化、启动前后端的逻辑"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我生成一个任务管理系统，类似待办事项。需求：\n1. 创建任务，每个任务有标题、描述、优先级（高/中/低）、截止日期、状态（待办/进行中/已完成）\n2. 任务列表页面，可以按状态筛选，按优先级排序\n3. 可以拖拽任务改变状态（从待办拖到进行中）\n4. 统计页面：显示总任务数、完成率、逾期任务数\n5. 可以导出任务列表为CSV\n是单用户使用，不需要多人协作。",
+      "expected_output": "生成任务管理应用，但由于功能数为5个（创建任务、任务列表、拖拽状态、统计页面、导出CSV），正好在限制范围内，应该全部实现。应包含：1. 任务CRUD功能；2. 状态筛选和优先级排序；3. 前端实现拖拽（但不使用WebSocket）；4. 统计仪表盘；5. CSV导出功能；6. 完整的项目文件和启动脚本",
+      "files": [],
+      "assertions": [
+        {
+          "name": "任务模型完整",
+          "check": "Task 模型包含 title, description, priority, due_date, status 字段"
+        },
+        {
+          "name": "状态管理正确",
+          "check": "状态字段支持 待办/进行中/已完成 三种值"
+        },
+        {
+          "name": "优先级管理",
+          "check": "优先级字段支持 高/中/低 三种值"
+        },
+        {
+          "name": "筛选和排序功能",
+          "check": "前端或后端包含按状态筛选、按优先级排序的逻辑"
+        },
+        {
+          "name": "CSV 导出功能",
+          "check": "存在导出 CSV 的 API endpoint 或前端实现"
+        },
+        {
+          "name": "统计功能实现",
+          "check": "包含统计相关的 API 或页面（总任务数、完成率等）"
+        },
+        {
+          "name": "无 WebSocket 依赖",
+          "check": "拖拽功能使用前端实现，不依赖 WebSocket 或实时通信"
+        },
+        {
+          "name": "代码完整性",
+          "check": "所有文件代码完整，无省略占位符"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "我想做一个电商管理系统，功能包括：\n1. 商品管理（添加、编辑、删除商品，上传商品图片，设置库存和价格）\n2. 订单管理（查看所有订单，订单状态跟踪，订单详情）\n3. 用户管理（查看注册用户，编辑用户权限，封禁用户）\n4. 购物车（用户可以添加商品到购物车，修改数量）\n5. 支付集成（对接支付宝和微信支付）\n6. 评论系统（用户可以对商品评论打分）\n7. 优惠券系统（创建优惠券，设置使用规则）\n8. 数据统计（销售额趋势图、热门商品排行、用户增长曲线）\n9. 库存预警（库存低于阈值时自动提醒）\n需要支持多商家入驻，每个商家独立管理自己的商品和订单。",
+      "expected_output": "Skill应该检测到9个功能请求，远超推荐的5个限制。应该输出警告信息，建议用户优先实现核心功能（如：1.商品管理、2.订单管理、3.用户管理、4.购物车、5.数据统计），并将支付集成、评论系统、优惠券系统、库存预警标记为延后实现。还应该指出支付集成（支付宝、微信支付）属于超出能力范围的功能，建议用模拟支付流程替代。",
+      "files": [],
+      "assertions": [
+        {
+          "name": "检测功能数量超限",
+          "check": "对话输出中提到功能数量超过 5 个的警告"
+        },
+        {
+          "name": "提供功能优先级建议",
+          "check": "明确列出建议优先实现的 5 个核心功能"
+        },
+        {
+          "name": "标记延后功能",
+          "check": "明确指出哪些功能应该延后实现"
+        },
+        {
+          "name": "识别支付为超范围功能",
+          "check": "明确指出支付集成（支付宝/微信）超出能力范围"
+        },
+        {
+          "name": "提供支付替代方案",
+          "check": "建议使用模拟支付流程作为替代"
+        },
+        {
+          "name": "请求用户确认",
+          "check": "询问用户是否接受简化方案或需要调整"
+        },
+        {
+          "name": "不生成完整9功能代码",
+          "check": "如果用户未确认，不应生成包含全部 9 个功能的完整代码"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "做一个简单的商品目录应用。功能：\n1. 商品列表展示（卡片布局）\n2. 商品详情页\n3. 添加新商品的表单\n只需要这3个功能就够了。",
+      "expected_output": "生成一个简洁的商品目录应用，应用理想汽车风格的主题色和 UI 组件。包含：1. 完整的项目文件；2. 使用理想汽车品牌色的 Tailwind 配置；3. 全局样式定义了 .btn-primary, .card, .input 等组件类；4. React 组件使用正确的类名；5. README 包含主题色自定义说明；6. 项目可一键启动",
+      "files": [],
+      "assertions": [
+        {
+          "name": "Tailwind 配置包含理想汽车色系",
+          "check": "frontend/tailwind.config.js 定义了 li-primary (#1F2937), li-accent (#00D084), li-green, li-gray 等颜色"
+        },
+        {
+          "name": "全局样式包含组件类",
+          "check": "frontend/src/index.css 定义了 .btn-primary, .btn-secondary, .card, .input 等 @layer components 类"
+        },
+        {
+          "name": "React 组件使用理想汽车类名",
+          "check": "前端组件中使用 bg-li-gray-50, text-li-primary, btn-primary, card 等类名"
+        },
+        {
+          "name": "页面容器使用正确的结构",
+          "check": "页面组件使用 min-h-screen bg-li-gray-50 p-8 作为外层容器"
+        },
+        {
+          "name": "标题使用正确的样式",
+          "check": "标题使用 text-4xl font-bold text-li-primary 等类名"
+        },
+        {
+          "name": "README 包含主题色自定义说明",
+          "check": "README.md 包含 '🎨 自定义主题色' 章节，说明如何更改颜色配置"
+        },
+        {
+          "name": "README 包含预设主题表格",
+          "check": "README 中有主题预设表格（理想汽车、经典蓝、活力橙、优雅紫）"
+        },
+        {
+          "name": "项目结构完整",
+          "check": "包含完整的 backend/, frontend/, start.py, README.md"
+        },
+        {
+          "name": "CORS 和 Proxy 配置正确",
+          "check": "main.py 有 CORS，vite.config.js 有 proxy 配置"
+        }
+      ]
+    }
+  ]
+}
