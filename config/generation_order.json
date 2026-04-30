@@ -1,0 +1,153 @@
+{
+  "phases": [
+    {
+      "name": "documentation",
+      "order": 1,
+      "files": [
+        {
+          "path": "README.md",
+          "template": "root/README.md.j2",
+          "type": "doc"
+        }
+      ]
+    },
+    {
+      "name": "backend",
+      "order": 2,
+      "files": [
+        {
+          "path": "backend/requirements.txt",
+          "template": "backend/requirements.txt.j2",
+          "type": "config"
+        },
+        {
+          "path": "backend/app/__init__.py",
+          "template": "backend/__init__.py.j2",
+          "type": "code"
+        },
+        {
+          "path": "backend/app/database.py",
+          "template": "backend/database.py.j2",
+          "type": "code"
+        },
+        {
+          "path": "backend/app/models.py",
+          "template": "backend/models.py.j2",
+          "type": "model"
+        },
+        {
+          "path": "backend/app/routes.py",
+          "template": "backend/routes.py.j2",
+          "type": "route"
+        },
+        {
+          "path": "backend/app/main.py",
+          "template": "backend/main.py.j2",
+          "type": "code"
+        },
+        {
+          "path": "backend/seed.py",
+          "template": "backend/seed.py.j2",
+          "type": "code"
+        }
+      ]
+    },
+    {
+      "name": "frontend",
+      "order": 3,
+      "files": [
+        {
+          "path": "frontend/package.json",
+          "template": "frontend/package.json.j2",
+          "type": "config"
+        },
+        {
+          "path": "frontend/vite.config.js",
+          "template": "frontend/vite.config.js.j2",
+          "type": "config"
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "template": "frontend/tailwind.config.js.j2",
+          "type": "config"
+        },
+        {
+          "path": "frontend/postcss.config.js",
+          "template": "frontend/postcss.config.js.j2",
+          "type": "config"
+        },
+        {
+          "path": "frontend/index.html",
+          "template": "frontend/index.html.j2",
+          "type": "html"
+        },
+        {
+          "path": "frontend/src/index.css",
+          "template": "frontend/src/index.css.j2",
+          "type": "style"
+        },
+        {
+          "path": "frontend/src/api/client.js",
+          "template": "frontend/src/api/client.js.j2",
+          "type": "code"
+        },
+        {
+          "path": "frontend/src/App.jsx",
+          "template": "frontend/src/App.jsx.j2",
+          "type": "component"
+        },
+        {
+          "path": "frontend/src/main.jsx",
+          "template": "frontend/src/main.jsx.j2",
+          "type": "code"
+        }
+      ]
+    },
+    {
+      "name": "scripts",
+      "order": 4,
+      "files": [
+        {
+          "path": "wait_for_port.py",
+          "template": "root/wait_for_port.py.j2",
+          "type": "script"
+        },
+        {
+          "path": "check_and_fix.py",
+          "template": "root/check_and_fix.py.j2",
+          "type": "script"
+        },
+        {
+          "path": "start.py",
+          "template": "root/start.py.j2",
+          "type": "script"
+        },
+        {
+          "path": "start.bat",
+          "template": "root/start.bat.j2",
+          "type": "script"
+        },
+        {
+          "path": "stop.bat",
+          "template": "root/stop.bat.j2",
+          "type": "script"
+        },
+        {
+          "path": "新手使用指南.md",
+          "template": "root/新手使用指南.md.j2",
+          "type": "documentation"
+        },
+        {
+          "path": "创建桌面快捷方式.md",
+          "template": "root/创建桌面快捷方式.md.j2",
+          "type": "documentation"
+        },
+        {
+          "path": ".gitignore",
+          "template": "root/.gitignore.j2",
+          "type": "config"
+        }
+      ]
+    }
+  ]
+}
