@@ -1,0 +1,63 @@
+import { useState, useEffect } from 'react'
+import { api } from './api/client'
+
+function App() {
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const data = await api.get('/')
+      setMessage(data.message)
+    } catch (error) {
+      setMessage('连接 API 失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-li-gray-50 p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="page-title">{{ app_name }}</h1>
+
+        <div className="card">
+          <h2 className="section-title">欢迎使用</h2>
+          {loading ? (
+            <p className="text-li-gray-600">加载中...</p>
+          ) : (
+            <div>
+              <p className="text-lg text-li-gray-700 mb-4">{message}</p>
+              <p className="text-sm text-li-gray-500">
+                {{ description }}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {% for table in database_schema.tables %}
+          {% set entity_name = table.name|pascal_case|replace('s', '') %}
+          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
+            <h3 className="text-xl font-semibold text-li-primary mb-2">
+              {{ entity_name }} 管理
+            </h3>
+            <p className="text-li-gray-600 mb-4">
+              查看和管理所有 {{ entity_name }} 数据
+            </p>
+            <button className="btn-primary w-full">
+              进入管理
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default App
