@@ -1,0 +1,21 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// 端口配置
+const FRONTEND_PORT = {{ frontend_port }}
+const BACKEND_PORT = {{ backend_port }}
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: FRONTEND_PORT,
+    strictPort: false,  // 如果端口被占用，自动尝试下一个可用端口
+    proxy: {
+      '/api': {
+        target: `http://localhost:${BACKEND_PORT}`,
+        changeOrigin: true
+      }
+    }
+  }
+})
