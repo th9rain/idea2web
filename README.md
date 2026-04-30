@@ -1,64 +1,75 @@
 # idea2web
 
-Turn a rough product idea into a practical web app scaffold.
+A reusable skill for turning a rough product idea into a practical full-stack web app scaffold.
 
 ## What it is
 
-`idea2web` is a project/skill direction for turning a one-line idea into a usable web application skeleton. The goal is not just to generate code, but to compress the path from vague intent to something concrete, structured, and ready to iterate on.
+`idea2web` is a skill that helps transform a one-line product idea into a more concrete web application starting point.
 
-## Why it exists
+Instead of stopping at vague brainstorming, it is designed to push the process toward something buildable: structure, scope, stack, data model, and an initial implementation path.
 
-A lot of product ideas die in the gap between:
-- “I have an idea”
-- “I have a running app I can react to”
+## What this skill does
 
-`idea2web` is meant to close that gap.
-
-## Core idea
-
-Given a rough prompt like:
+Given an idea like:
 - "Build me a small internal dashboard"
-- "I want a tool to track project progress"
+- "Create a tool for tracking project progress"
 - "Generate a simple CRUD app for managing leads"
 
-The system should help turn that into:
-- a scoped product concept
-- a basic app structure
-- frontend/backend scaffold
-- data model suggestions
-- a path to the next iteration
+`idea2web` helps turn that into:
+- a clearer product definition
+- a scoped first version
+- a frontend/backend structure
+- a suggested data model
+- a runnable scaffold for iteration
 
-## What it tries to optimize for
+## Why this skill exists
 
-- Speed from idea to first version
-- Clear structure instead of chaotic prototyping
-- Practical full-stack output
-- Reusable workflow, not one-off prompting
+A lot of useful ideas never become real tools because the gap between:
+- "I have an idea"
+- "I have a first usable version"
+
+is still too large.
+
+This skill exists to compress that gap.
+
+## What it optimizes for
+
+- Fast path from idea to first version
+- Practical scaffolding instead of abstract brainstorming
+- Repeatable workflow instead of one-off prompting
+- Full-stack output that can keep evolving
+
+## Skill perspective
+
+This repository is meant to represent `idea2web` as a reusable skill, not just a random app concept.
+
+That means over time it should contain:
+- skill definition
+- trigger conditions / use cases
+- workflow logic
+- scaffolding strategy
+- example inputs and outputs
+- implementation assets or templates
 
 ## Status
 
-Early public version. This repository will gradually collect:
-- skill design
-- prompt / workflow structure
-- project scaffolding logic
-- examples
-- documentation
+Early public version. More examples, structure, and packaged skill assets can be added over time.
 
-## Why this matters to me
+## Why it matters
 
-I care about building systems that make repeated work more structured and reusable. `idea2web` fits that pattern: it turns the messy front-end of product thinking into a repeatable workflow.
+I care about turning repeated messy work into reusable systems. `idea2web` follows that pattern: it packages early-stage product thinking into a repeatable delivery workflow.
 
 ## Roadmap
 
-- [ ] Define the input/output contract clearly
-- [ ] Add examples of idea → generated app
-- [ ] Add project structure template
-- [ ] Add automation / generation pipeline
-- [ ] Connect it back to a reusable skill package
+- [ ] Add explicit skill definition and trigger wording
+- [ ] Add example idea → generated app cases
+- [ ] Add app scaffold template
+- [ ] Add workflow and generation logic
+- [ ] Package the public-facing version more clearly
 
 ## Related
 
-- GitHub profile maintainer
-- AI workflow systems
 - reusable skills
+- AI workflow systems
+- product-to-build pipelines
 - automation for real work
