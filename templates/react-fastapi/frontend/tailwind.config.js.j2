@@ -1,0 +1,45 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // 理想汽车深绿色系
+        'li-green-base': '{{ theme.colors.green.base }}',
+        'li-green-card': '{{ theme.colors.green.card }}',
+        'li-green-hover': '{{ theme.colors.green.hover }}',
+
+        // 理想汽车金色系
+        'li-gold': {
+          DEFAULT: '{{ theme.colors.gold.DEFAULT }}',
+          light: '{{ theme.colors.gold.light }}',
+          dark: '{{ theme.colors.gold.dark }}',
+        },
+
+        // 灰色系
+        'li-gray': {
+          50: '{{ theme.colors.gray["50"] }}',
+          100: '{{ theme.colors.gray["100"] }}',
+          200: '{{ theme.colors.gray["200"] }}',
+          300: '{{ theme.colors.gray["300"] }}',
+          400: '{{ theme.colors.gray["400"] }}',
+          500: '{{ theme.colors.gray["500"] }}',
+          600: '{{ theme.colors.gray["600"] }}',
+          700: '{{ theme.colors.gray["700"] }}',
+          800: '{{ theme.colors.gray["800"] }}',
+          900: '{{ theme.colors.gray["900"] }}',
+        },
+      },
+      borderRadius: {
+        'li-card': '{{ theme.borderRadius.card }}',
+      },
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"PingFang SC"', '"Helvetica Neue"', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+}
