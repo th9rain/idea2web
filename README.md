@@ -1,75 +1,86 @@
 # idea2web
 
-A reusable skill for turning a rough product idea into a practical full-stack web app scaffold.
+A real reusable skill for generating full-stack web applications from a one-line idea.
 
 ## What it is
 
-`idea2web` is a skill that helps transform a one-line product idea into a more concrete web application starting point.
+`idea2web` is a packaged skill that turns a vague product idea into a practical full-stack web app scaffold.
 
-Instead of stopping at vague brainstorming, it is designed to push the process toward something buildable: structure, scope, stack, data model, and an initial implementation path.
+It is not just a concept note or a prompt draft. It is an actual skill with workflow instructions, templates, scripts, config, and references for generating usable applications.
+
+## Install
+
+```bash
+npx skills add https://gitlab.chehejia.com/ai-market/lixiang-skills-marketplace/-/tree/master/packages/idea2web --depth 1 --single-branch
+```
 
 ## What this skill does
 
-Given an idea like:
-- "Build me a small internal dashboard"
-- "Create a tool for tracking project progress"
-- "Generate a simple CRUD app for managing leads"
+From a short request like:
+- "Build me an internal dashboard"
+- "Create a small CRUD tool"
+- "Generate a simple web app for tracking tasks"
 
-`idea2web` helps turn that into:
-- a clearer product definition
-- a scoped first version
-- a frontend/backend structure
-- a suggested data model
-- a runnable scaffold for iteration
+`idea2web` helps produce:
+- structured requirement clarification
+- architecture planning
+- API and file structure design
+- full-stack code generation
+- deployment/startup guidance
 
-## Why this skill exists
+## Default stack
 
-A lot of useful ideas never become real tools because the gap between:
-- "I have an idea"
-- "I have a first usable version"
+By default, the skill generates a practical full-stack stack such as:
+- React (Vite)
+- FastAPI
+- SQLite
+- Tailwind CSS
 
-is still too large.
+It can also adapt in specific cases such as Vue or Streamlit-oriented requests.
 
-This skill exists to compress that gap.
+## Workflow
 
-## What it optimizes for
+The skill follows a four-stage workflow:
 
-- Fast path from idea to first version
-- Practical scaffolding instead of abstract brainstorming
-- Repeatable workflow instead of one-off prompting
-- Full-stack output that can keep evolving
+1. **Requirement clarification**
+   - extract entities and operations
+   - ask a small number of focused questions
+   - produce a structured PRD
 
-## Skill perspective
+2. **Architecture planning**
+   - choose the stack
+   - design schema and REST API
+   - generate API spec and file tree
 
-This repository is meant to represent `idea2web` as a reusable skill, not just a random app concept.
+3. **Code generation**
+   - generate the project files directly
+   - include backend, frontend, config, and seed data
 
-That means over time it should contain:
-- skill definition
-- trigger conditions / use cases
-- workflow logic
-- scaffolding strategy
-- example inputs and outputs
-- implementation assets or templates
+4. **Delivery**
+   - provide startup scripts
+   - provide beginner-friendly usage guidance
 
-## Status
+## Why I built it
 
-Early public version. More examples, structure, and packaged skill assets can be added over time.
+I care about making repeated work more structured and reusable. A lot of software ideas die before they become a usable first version. `idea2web` exists to compress that gap and turn vague intent into something buildable.
 
-## Why it matters
+## Repository contents
 
-I care about turning repeated messy work into reusable systems. `idea2web` follows that pattern: it packages early-stage product thinking into a repeatable delivery workflow.
+This skill includes real implementation assets such as:
+- `SKILL.md`
+- generation scripts
+- config files
+- templates
+- references
+- evals
 
-## Roadmap
+## Positioning
 
-- [ ] Add explicit skill definition and trigger wording
-- [ ] Add example idea → generated app cases
-- [ ] Add app scaffold template
-- [ ] Add workflow and generation logic
-- [ ] Package the public-facing version more clearly
+`idea2web` is best understood as a reusable skill for product-to-build workflows, not just a demo repo.
 
-## Related
+## Related themes
 
 - reusable skills
 - AI workflow systems
-- product-to-build pipelines
-- automation for real work
+- product-to-build automation
+- practical full-stack generation
