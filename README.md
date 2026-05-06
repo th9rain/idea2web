@@ -1,76 +1,148 @@
 # idea2web
 
-A real reusable skill for generating full-stack web applications from a one-line idea.
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-## What it is
+> Turn a rough product idea into a practical full-stack web app scaffold.
 
-`idea2web` is a packaged skill that turns a vague product idea into a practical full-stack web app scaffold.
+`idea2web` is a reusable skill and CLI workflow for taking a short product prompt, turning it into a structured build plan, and generating a usable starter application.
 
-It is not just a concept note or a prompt draft. It is an actual skill with workflow instructions, templates, scripts, config, and references for generating usable applications.
+It is aimed at the gap between "I have an idea" and "I have something concrete I can run, inspect, and extend."
 
-## What this skill does
+## What it does
 
-From a short request like:
-- "Build me an internal dashboard"
-- "Create a small CRUD tool"
-- "Generate a simple web app for tracking tasks"
+From a short request such as:
+- "Build an internal dashboard"
+- "Create a CRUD tool for task tracking"
+- "Generate a small operations app for approvals"
 
 `idea2web` helps produce:
 - structured requirement clarification
-- architecture planning
-- API and file structure design
-- full-stack code generation
-- deployment/startup guidance
+- a lightweight PRD
+- architecture and API planning
+- full-stack project scaffolding
+- startup and delivery guidance
 
 ## Default stack
 
-By default, the skill generates a practical full-stack stack such as:
-- React (Vite)
+The current template path is optimized for a practical default stack:
+- React + Vite
 - FastAPI
 - SQLite
 - Tailwind CSS
 
-It can also adapt in specific cases such as Vue or Streamlit-oriented requests.
+The repository is organized so the workflow can evolve toward additional stacks later, but the current public path is intentionally narrow and usable.
 
 ## Workflow
 
-The skill follows a four-stage workflow:
+`idea2web` follows four stages:
 
 1. **Requirement clarification**
-   - extract entities and operations
-   - ask a small number of focused questions
+   - extract entities, operations, and constraints
+   - surface missing assumptions
    - produce a structured PRD
 
 2. **Architecture planning**
-   - choose the stack
-   - design schema and REST API
-   - generate API spec and file tree
+   - choose a stack
+   - shape the data model and API
+   - produce an implementation plan and file tree
 
 3. **Code generation**
-   - generate the project files directly
-   - include backend, frontend, config, and seed data
+   - generate backend, frontend, config, and seed assets
+   - render project templates into a runnable scaffold
 
 4. **Delivery**
    - provide startup scripts
    - provide beginner-friendly usage guidance
 
-## Why I built it
+## Quick start
 
-I care about making repeated work more structured and reusable. A lot of software ideas die before they become a usable first version. `idea2web` exists to compress that gap and turn vague intent into something buildable.
+Install dependencies:
 
-## Repository contents
+```bash
+pip install -r requirements.txt
+```
 
-This repository includes the core public skill assets such as:
-- `SKILL.md`
-- generation scripts
-- config files
-- templates
-- references
-- evals
+Generate a project in one shot:
 
-## Positioning
+```bash
+python -m scripts quick --user-input "Build an internal task dashboard" --output-dir ./my-app
+```
 
-`idea2web` is best understood as a reusable skill for product-to-build workflows, not just a demo repo.
+Run the staged flow manually:
+
+```bash
+python scripts/generator.py analyze --user-input "Build an internal task dashboard" --output prd.json
+python scripts/generator.py plan --prd prd.json --output architecture.json
+python scripts/generator.py generate --architecture architecture.json --output-dir ./my-app
+```
+
+## Repository structure
+
+```text
+idea2web/
+|-- README.md
+|-- LICENSE
+|-- SKILL.md
+|-- requirements.txt
+|-- config/
+|-- evals/
+|-- references/
+|-- scripts/
+`-- templates/
+```
+
+## Key files
+
+- `SKILL.md` - reusable skill definition for product-to-build workflows
+- `scripts/` - CLI entrypoints and generation pipeline
+- `templates/react-fastapi/` - concrete scaffold for the current default stack
+- `config/` - generation defaults, ordering, and stack metadata
+- `references/` - implementation notes, deployment guidance, and generation rules
+- `evals/` - evaluation cases for checking workflow quality
+
+## What this repo is not
+
+This repo is not:
+- a finished no-code product builder
+- a generic website generator for every framework
+- a polished SaaS platform
+
+It is a practical starting point for repeatable "idea to runnable app" generation workflows.
+
+## Why this repo exists
+
+A lot of product ideas die before they become a usable first version.
+
+`idea2web` exists to compress that gap:
+- turn vague requests into structured requirements
+- turn structure into implementation decisions
+- turn decisions into a starter codebase that can actually be extended
+
+## Current limitations
+
+Right now, the strongest path in this repo is the React + FastAPI scaffold. That is deliberate.
+
+It is better for a public repository to have one clear, reusable path than to pretend to support every stack equally well.
+
+## Suggested GitHub metadata
+
+**Repository description**
+
+> Turn product ideas into practical full-stack web app scaffolds.
+
+**Suggested topics**
+
+```text
+code-generation
+full-stack
+app-generator
+fastapi
+react
+vite
+tailwindcss
+developer-tools
+workflow-automation
+```
 
 ## Related themes
 
@@ -78,3 +150,7 @@ This repository includes the core public skill assets such as:
 - AI workflow systems
 - product-to-build automation
 - practical full-stack generation
+
+## License
+
+MIT
